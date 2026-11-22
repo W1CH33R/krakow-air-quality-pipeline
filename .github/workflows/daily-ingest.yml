@@ -1,0 +1,61 @@
+name: Daily air-quality ingestion
+
+on:
+  schedule:
+    - cron: "27 7 * * *"
+  workflow_dispatch:
+    inputs:
+      days:
+        description: "Completed UTC days to import (14 recommended for first run)"
+        required: true
+        default: "3"
+        type: choice
+        options:
+          - "1"
+          - "3"
+          - "7"
+          - "14"
+          - "30"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: air-quality-ingestion
+  cancel-in-progress: false
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install project
+        run: python -m pip install -e .
+      - name: Check remote database configuration
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "::error::Configure GitHub Actions repository secret DATABASE_URL before running ingestion."
+            exit 1
+          fi
+      - name: Import completed UTC days
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DAYS: ${{ inputs.days || '3' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          case "$DAYS" in
+            1|3|7|14|30) ;;
+            *) echo "::error::Invalid days value"; exit 1 ;;
+          esac
+          for offset in $(seq "$DAYS" -1 1); do
+            day=$(date -u -d "$offset days ago" +%Y-%m-%d)
+            echo "Loading completed UTC day $day"
+            python -m krakow_air --date "$day"
+          done

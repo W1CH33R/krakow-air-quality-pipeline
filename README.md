@@ -2,6 +2,10 @@
 
 Explore hourly modeled PM2.5, PM10 and European AQI for Krakow. The pipeline loads completed UTC days into PostgreSQL. The Streamlit dashboard compares daily means, pollution peaks and coverage by local calendar date.
 
+## Public demo deployment
+
+For a public Streamlit dashboard backed by a persistent cloud PostgreSQL database and a daily GitHub Actions ingestion schedule, follow the [deployment guide](docs/DEPLOYMENT.md). A public demo URL will be added **only after** the app has actually been deployed and verified. Local Docker operation remains supported.
+
 ## Run with Docker Compose
 
 Install Docker with the Compose v2 plugin and start the Docker engine. Extract the ZIP if needed and open a terminal in the folder containing `compose.yaml`. You need internet access to download images and retrieve data from Open-Meteo.
