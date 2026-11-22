@@ -9,3 +9,4 @@ tests
 *.egg-info
 build
 dist
+.streamlit/secrets.toml
