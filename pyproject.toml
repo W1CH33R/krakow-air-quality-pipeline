@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "krakow-air-quality"
+version = "0.1.0"
+description = "Hourly modeled air quality for Krakow"
+requires-python = ">=3.12"
+dependencies = ["SQLAlchemy>=2.0,<2.1", "psycopg[binary]>=3.2,<4",
+                "streamlit>=1.52,<2", "pandas>=2.2,<3", "altair>=5,<6"]
+
+[project.optional-dependencies]
+test = ["pytest>=8,<10"]
+
+[tool.setuptools]
+packages = ["krakow_air"]
+
+[tool.setuptools.package-data]
+krakow_air = ["sql/*.sql"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["integration: requires a disposable PostgreSQL database"]
